@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="baidu-site-verification" content="pEnxIproHH">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>readline库的简单使用 | pxBlog</title>
+  <meta name="description" content="&amp;emsp;&amp;emsp;这周要实现一个简单的 shell, 平时使用bash, zsh这些shell的时候, 如果文件名或命令太长，又或者要频繁执行几条命令的话，最常用的应该就是tab键补全和上下键切换历史命令了。 &amp;emsp;&amp;emsp;想要在自己的shell里面实现这两个功能很困难，但有一个Ｃ语言库集成了这些功能，只需要调用几个函数就可以实现这两个功能。 &amp;emsp;&amp;emsp;The GNU">
+<meta name="keywords" content="readline">
+<meta property="og:type" content="article">
+<meta property="og:title" content="readline库的简单使用">
+<meta property="og:url" content="https://phoenixxc.github.io/posts/3faf94c3/index.html">
+<meta property="og:site_name" content="pxBlog">
+<meta property="og:description" content="&amp;emsp;&amp;emsp;这周要实现一个简单的 shell, 平时使用bash, zsh这些shell的时候, 如果文件名或命令太长，又或者要频繁执行几条命令的话，最常用的应该就是tab键补全和上下键切换历史命令了。 &amp;emsp;&amp;emsp;想要在自己的shell里面实现这两个功能很困难，但有一个Ｃ语言库集成了这些功能，只需要调用几个函数就可以实现这两个功能。 &amp;emsp;&amp;emsp;The GNU">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-1.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-2.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-3.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-4.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-5.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-6.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-7.png">
+<meta property="og:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-8.png">
+<meta property="og:updated_time" content="2019-02-26T09:42:30.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="readline库的简单使用">
+<meta name="twitter:description" content="&amp;emsp;&amp;emsp;这周要实现一个简单的 shell, 平时使用bash, zsh这些shell的时候, 如果文件名或命令太长，又或者要频繁执行几条命令的话，最常用的应该就是tab键补全和上下键切换历史命令了。 &amp;emsp;&amp;emsp;想要在自己的shell里面实现这两个功能很困难，但有一个Ｃ语言库集成了这些功能，只需要调用几个函数就可以实现这两个功能。 &amp;emsp;&amp;emsp;The GNU">
+<meta name="twitter:image" content="https://phoenixxc.github.io/images/2019-01-26-readline-1.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://phoenixxc.github.io/posts/3faf94c3/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="pxBlog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+    <link href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.css" rel="stylesheet">
+  
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.css">
+  
+  <!--  -->
+
+  <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+        
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/PhoenixXC" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">PhoenixXC</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md"></h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Xi&#39;an, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">一言</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>虽千万人，吾往矣<hr>曾有蝼蚁想穿越汪洋<br>穿越整个天地<br>看看最远的地方<hr></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux-C/">Linux C</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/">Servlet</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSP-Servlet学习笔记/">JSP&Servlet学习笔记</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Note/">Note</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringBoot/">SpringBoot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/readline/">readline</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a><span class="tag-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/JSP-Servlet学习笔记/" style="font-size: 13.67px;">JSP&Servlet学习笔记</a> <a href="/tags/Java/" style="font-size: 13px;">Java</a> <a href="/tags/Note/" style="font-size: 14px;">Note</a> <a href="/tags/SpringBoot/" style="font-size: 13px;">SpringBoot</a> <a href="/tags/readline/" style="font-size: 13px;">readline</a> <a href="/tags/springboot/" style="font-size: 13.33px;">springboot</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/603dd0d7/" class="title">学习笔记－疯狂Java讲义[4]</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.774Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2f1b8bf3/" class="title">Chapter7-使用JSTL</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2bd95d05/" class="title">Chapter6-使用jsp</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/92aa08ef/" class="title">Chapter2 编写与设置Servlet</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/b2e1ccaf/" class="title">Chapter4 会话管理基本原理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#readline"><span class="toc-number">1.</span> <span class="toc-text">readline()</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#history-h"><span class="toc-number">2.</span> <span class="toc-text">history.h</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-readline库的简单使用" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      readline库的简单使用
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/3faf94c3/" class="article-date">
+	  <time datetime="2019-01-26T09:37:00.000Z" itemprop="datePublished">2019-01-26</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Linux-C/">Linux C</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/readline/">readline</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/3faf94c3/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.8k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 7(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <p>&emsp;&emsp;这周要实现一个简单的 shell, 平时使用bash, zsh这些shell的时候, 如果文件名或命令太长，又或者要频繁执行几条命令的话，最常用的应该就是tab键补全和上下键切换历史命令了。</p>
+<p>&emsp;&emsp;想要在自己的shell里面实现这两个功能很困难，但有一个Ｃ语言库集成了这些功能，只需要调用几个函数就可以实现这两个功能。</p>
+<p>&emsp;&emsp;<a href="https://tiswww.case.edu/php/chet/readline/rltop.html" target="_blank" rel="noopener">The GNU Readline Library</a></p>
+<p>&emsp;&emsp;可以在这里找到有关 <code>readline</code> 库的相关资料和下载地址，软件包里面也提供了很多手册和示例。</p>
+<p><img src="/images/2019-01-26-readline-1.png" alt="upload successful"></p>
+<p>&emsp;&emsp;实现shell用到的函数不是很多，tab键补全，上下键切换历史命令，添加历史命令等等</p>
+<h1 id="readline"><a href="#readline" class="headerlink" title="readline()"></a>readline()</h1><p>&emsp;&emsp;在 <code>readline.h</code> 里可以找到关于他的定义：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Readline functions. */</span></span><br><span class="line"><span class="comment">/* Read a line of input.  Prompt with PROMPT.  A NULL PROMPT means none. */</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">char</span> *readline <span class="title">PARAMS</span><span class="params">((<span class="keyword">const</span> <span class="keyword">char</span> *))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&nbsp;&nbsp;&nbsp;readline() 的参数是一个字符串，调用函数的时候会在屏幕上输出，这个函数会读取一行输入，然后返回一个指向输入字符串的指针，readline 会为输入的字符串动态分配内存，所以使用完之后需要free掉。</p>
+<p>&emsp;&emsp;下面举一个简单的例子</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;readline/readline.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">char</span> * str = readline(<span class="string">"Myshell $ "</span>);</span><br><span class="line">        <span class="built_in">free</span>(str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&nbsp;&emsp;&emsp;由于readline是一个动态库，编译的时候需要加上　<code>-lreadline</code>，不然会找不到相关的函数<br>当我们按下tab键之后发现就可以实现bash里面的补全功能了。</p>
+<p><img src="/images/2019-01-26-readline-2.png" alt="upload successful"></p>
+<p> &emsp;用惯了zsh后发现黑白的提示符好难看，于是也想着给里面的参数加上颜色。C语言中输出有颜色的字符printf就可以实现，模板类似这样<code>printf(&quot;\033[47;31m string \033[0m&quot;);</code></p>
+<p>&emsp;&emsp;47是背景色，31是字符的颜色，string 是要输出的字符串，\033[5m 是ANSI控制码，意思是关闭输出的属性，不然以后的输出都会是之前设置的颜色。相关的内容网上有很多可以自行查阅。</p>
+<p>&emsp;&emsp;为了方便使用，加上了这些宏定义</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLOSE <span class="meta-string">"\033[0m"</span>                 <span class="comment">// 关闭所有属性</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLOD  <span class="meta-string">"\033[1m"</span>                 <span class="comment">// 强调、加粗、高亮</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BEGIN(x,y) <span class="meta-string">"\033["</span>#x<span class="meta-string">";"</span>#y<span class="meta-string">"m"</span>    <span class="comment">// x: 背景，y: 前景</span></span></span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;在修改一下readline()这个函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> * str = readline(BEGIN(<span class="number">49</span>, <span class="number">34</span>)<span class="string">"Myshell $ "</span>CLOSE);</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;然后编译运行：</p>
+<p><img src="/images/2019-01-26-readline-3.png" alt="upload successful"><br>&emsp;&emsp;似乎一切完美，但当我们输入很长很长的字符串之后：&emsp;&emsp;</p>
+<p><img src="/images/2019-01-26-readline-4.png" alt="upload successful"></p>
+<p>&emsp;&emsp;emmmm……………输入太多会导致提示符被输入覆盖，写个shell出现这种状况岂不是贼尴尬</p>
+<p>&emsp;&emsp;查资料查了很久才找到解决方法：这个bug需要在非打印字符前后加上　<code>\001</code> 和　<code>\002</code> 才能解决</p>
+<p>&emsp;&emsp;其实头文件就有提到</p>
+<p><img src="/images/2019-01-26-readline-5.png" alt="upload successful"></p>
+<p>&emsp;&emsp;在之前定义的宏里面加上这两个字符之后终于解决了</p>
+<p><img src="/images/2019-01-26-readline-6.png" alt="upload successful"></p>
+<p>&emsp;&emsp;最后的代码为：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;readline/readline.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> CLOSE <span class="meta-string">"\001\033[0m\002"</span>                 <span class="comment">// 关闭所有属性</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BLOD  <span class="meta-string">"\001\033[1m\002"</span>                 <span class="comment">// 强调、加粗、高亮</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BEGIN(x,y) <span class="meta-string">"\001\033["</span>#x<span class="meta-string">";"</span>#y<span class="meta-string">"m\002"</span>    <span class="comment">// x: 背景，y: 前景</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">char</span> * str = readline(BEGIN(<span class="number">49</span>, <span class="number">34</span>)<span class="string">"Myshell $ "</span>CLOSE);</span><br><span class="line">        <span class="built_in">free</span>(str);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;readline使用的时候默认了tab补全，但是我们平时用到的shell不但可以补全文件名，还可以补全命令。readline库当然也提供了这个功能，具体如何使用可以看这篇博客。</p>
+<p>&emsp;&emsp;<a href="https://www.cnblogs.com/hazir/p/instruction_to_readline.html" target="_blank" rel="noopener">GNU Readline 库及编程简介</a></p>
+<p>&emsp;&emsp;单独的使用readline()并没有上下键切换补全的功能，实现这个需要用到另一个函数 - <code>add_history()</code></p>
+<h1 id="history-h"><a href="#history-h" class="headerlink" title="history.h"></a>history.h</h1><p>&emsp;&emsp;上下键切换需要我们把输入的字符串加入到历史命令中，需要调用</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Place STRING at the end of the history list.</span></span><br><span class="line"><span class="comment">   The associated data field (if any) is set to NULL. */</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">void</span> add_history <span class="title">PARAMS</span><span class="params">((<span class="keyword">const</span> <span class="keyword">char</span> *))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;函数接受一个字符串作为参数存入到历史文件中，函数的定义在history.h中，使用的时候需要包含头文件 &lt;readline/history.h&gt;</p>
+<p>&emsp;&emsp;我们在代码中加入这个函数的调用就可以使用上下键切换历史命令了</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">char</span> * str = readline(BEGIN(<span class="number">49</span>, <span class="number">34</span>)<span class="string">"Myshell $ "</span>CLOSE);</span><br><span class="line">add_history(str);</span><br><span class="line"><span class="built_in">free</span>(str);</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;编译后测试了一下发现功能完美运行。</p>
+<p>&emsp;&emsp;但是关掉程序在尝试一下发现，诶？我不能切换到上一次运行程序的历史命令，只能记录本次运行中输入的命令。然后开始查看头文件的内容，发现了不少和history有关的函数。</p>
+<p>&emsp;&emsp;其中有两个正好用的上</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Add the contents of FILENAME to the history list, a line at a time.</span></span><br><span class="line"><span class="comment">   If FILENAME is NULL, then read from ~/.history.  Returns 0 if</span></span><br><span class="line"><span class="comment">   successful, or errno if not. */</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">int</span> read_history <span class="title">PARAMS</span><span class="params">((<span class="keyword">const</span> <span class="keyword">char</span> *))</span></span>;</span><br><span class="line"><span class="comment">/* Write the current history to FILENAME.  If FILENAME is NULL,</span></span><br><span class="line"><span class="comment">   then write the history list to ~/.history.  Values returned</span></span><br><span class="line"><span class="comment">   are as in read_history ().  */</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> <span class="keyword">int</span> write_history <span class="title">PARAMS</span><span class="params">((<span class="keyword">const</span> <span class="keyword">char</span> *))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;<code>read_history()</code>和<code>write_history()</code>都接受一个字符串做参数，成功返回０，错误则把相应的错误码赋值给errno。</p>
+<p>&emsp;&emsp;两个函数接受的参数都是一个文件名，read_history() 从指定的文件中读取历史记录，write_history() 将历史记录存入指定的文件。如果参数为NULL默认的文件是：<code>~/.history</code></p>
+<p>&emsp;&emsp;有了这个函数，我们只要在程序最开处加上read_history(NULL), add_history(str)之后加上 write_history() 就可以了。</p>
+<p>&emsp;&emsp;这样下次运行程序的时候我们就可以找到上次运行的历史命令了。</p>
+<p>&emsp;&emsp;shell 的内置命令不多，cd 是一个, history也是一个shell内置的命令。</p>
+<p><img src="/images/2019-01-26-readline-7.png" alt="upload successful"></p>
+<p>&emsp;&emsp;readline既然可以把输入加入历史，读入和写进历史，那么自然可以读取历史文件列表，头文件中我们可以找到这样一个函数：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* Return a NULL terminated array of HIST_ENTRY which is the current input history.  Element 0 of this list is the beginning of time.  If there is no history, return NULL. */</span></span><br><span class="line"><span class="function"><span class="keyword">extern</span> HIST_ENTRY **history_list <span class="title">PARAMS</span><span class="params">((<span class="keyword">void</span>))</span></span>;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;这个函数可以查看存储的 history 列表，HIST_ENTRY　是一个结构体类型，存储了很多信息：&emsp;&emsp;</p>
+<p><img src="/images/2019-01-26-readline-8.png" alt="upload successful"></p>
+<p>&emsp;&emsp;我们要的历史内容就存储在 <code>data</code> 元素里面。</p>
+<p>&emsp;&emsp;这个函数返回一个数组，以空指针为结束标志，我们简单封装一下就可以实现一个自己 shell 内置的 <code>history</code> 函数了。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">ShowHistory</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">    HIST_ENTRY ** his;</span><br><span class="line">    his = history_list();</span><br><span class="line">    <span class="keyword">while</span>(his[i] != <span class="literal">NULL</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">"%s\n"</span>, his[i]-&gt;line);</span><br><span class="line">        i++;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>&emsp;&emsp;history.h 里面提供了很多函数，我们的要实现一个简单的shell用到的函数上面都提到过，更多的函数可以在官方文档里面查看。</p>
+<p>&emsp;&emsp;realine 这个库很强大，现在只是发现了他的冰山一角，提供的功能远远超过上述所说的。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://phoenixxc.github.io/posts/3faf94c3/" title="readline库的简单使用" target="_blank" rel="external">https://phoenixxc.github.io/posts/3faf94c3/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+           
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/cb2b0fb3/" title="SpringBoot之环境配置"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/4a17b156/" title="Hello World"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2019 PhoenixBM
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <!-- <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"> -->
+  <script src="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/blueimp-md5@2.10.0/js/md5.min.js"></script>
+  <script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '7dd5f62e69a350081d67',
+    clientSecret: '21de774924dfc29594c7e6b1edb66ec1d47de4a6',
+    repo: 'PhoenixXC.github.io',
+    owner: 'PhoenixXC',
+    admin: ['PhoenixXC'],
+    id: md5(location.pathname),
+    distractionFreeMode: true
+  })
+  gitalk.render('comments')
+  </script>
+
+      
+
+
+
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.js"></script>
+  <script>
+  //利用 FancyBox 实现点击图片放大
+  $(document).ready(function() {
+    $('article img').not('[hidden]').not('.panel-body img').each(function() {
+      var $image = $(this);
+      var imageCaption = $image.attr('alt');
+      var $imageWrapLink = $image.parent('a');
+      if ($imageWrapLink.length < 1) {
+        var src = this.getAttribute('src');
+        var idx = src.lastIndexOf('?');
+        if (idx != -1) {
+          src = src.substring(0, idx);
+        }
+        $imageWrapLink = $image.wrap('<a href="' + src + '"></a>').parent('a');
+      }
+      $imageWrapLink.attr('data-fancybox', 'images');
+      if (imageCaption) {
+        $imageWrapLink.attr('data-caption', imageCaption);
+      }
+    });
+    $().fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+    });
+  });
+  </script>
+
+
+
+    <script defer type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-133199137-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

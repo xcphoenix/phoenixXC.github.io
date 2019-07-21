@@ -1,0 +1,13 @@
+# hexo robots.txt
+User-agent: *
+Allow: /
+Allow: /posts
+Allow: /archives/
+
+Disallow: /vendors/
+Disallow: /js/
+Disallow: /css/
+Disallow: /fonts/
+
+Sitemap: https://phoenixxc.github.io/sitemap.xml
+Sitemap: https://phoenixxc.github.io/baidusitemap.xml

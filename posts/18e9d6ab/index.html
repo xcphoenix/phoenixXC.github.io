@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="baidu-site-verification" content="pEnxIproHH">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>SpringBoot之日志 | pxBlog</title>
+  <meta name="description" content="日志框架日志门面：日志的一个抽象层 市面上的日志框架：JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j…**    日志门面 日志实现     JCL（久不更新）、SLF4j、jboss-logging（不适用于普通人群） Log4j、JUL（Java 自带）、log4j2（框架好但是有些尚未适配）、Logback（与Log4j是同一个作者）">
+<meta name="keywords" content="springboot">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SpringBoot之日志">
+<meta property="og:url" content="https://phoenixxc.github.io/posts/18e9d6ab/index.html">
+<meta property="og:site_name" content="pxBlog">
+<meta property="og:description" content="日志框架日志门面：日志的一个抽象层 市面上的日志框架：JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j…**    日志门面 日志实现     JCL（久不更新）、SLF4j、jboss-logging（不适用于普通人群） Log4j、JUL（Java 自带）、log4j2（框架好但是有些尚未适配）、Logback（与Log4j是同一个作者）">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720143617.png">
+<meta property="og:image" content="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720144123.png">
+<meta property="og:image" content="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720145802.png">
+<meta property="og:image" content="https://phoenixxc.github.io/IdeaProjects/SpringBoot-ShangGuiG/images/1563610047818.png">
+<meta property="og:updated_time" content="2019-07-21T14:59:02.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SpringBoot之日志">
+<meta name="twitter:description" content="日志框架日志门面：日志的一个抽象层 市面上的日志框架：JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j…**    日志门面 日志实现     JCL（久不更新）、SLF4j、jboss-logging（不适用于普通人群） Log4j、JUL（Java 自带）、log4j2（框架好但是有些尚未适配）、Logback（与Log4j是同一个作者）">
+<meta name="twitter:image" content="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720143617.png">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://phoenixxc.github.io/posts/18e9d6ab/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="pxBlog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+    <link href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.css" rel="stylesheet">
+  
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.css">
+  
+  <!--  -->
+
+  <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+        
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/PhoenixXC" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">PhoenixXC</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md"></h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Xi&#39;an, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">一言</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>虽千万人，吾往矣<hr>曾有蝼蚁想穿越汪洋<br>穿越整个天地<br>看看最远的地方<hr></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux-C/">Linux C</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/">Servlet</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSP-Servlet学习笔记/">JSP&Servlet学习笔记</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Note/">Note</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringBoot/">SpringBoot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/readline/">readline</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a><span class="tag-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/JSP-Servlet学习笔记/" style="font-size: 13.67px;">JSP&Servlet学习笔记</a> <a href="/tags/Java/" style="font-size: 13px;">Java</a> <a href="/tags/Note/" style="font-size: 14px;">Note</a> <a href="/tags/SpringBoot/" style="font-size: 13px;">SpringBoot</a> <a href="/tags/readline/" style="font-size: 13px;">readline</a> <a href="/tags/springboot/" style="font-size: 13.33px;">springboot</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/603dd0d7/" class="title">学习笔记－疯狂Java讲义[4]</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.774Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2f1b8bf3/" class="title">Chapter7-使用JSTL</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2bd95d05/" class="title">Chapter6-使用jsp</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/92aa08ef/" class="title">Chapter2 编写与设置Servlet</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/b2e1ccaf/" class="title">Chapter4 会话管理基本原理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#日志框架"><span class="toc-number">1.</span> <span class="toc-text">日志框架</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SLF4j-的使用"><span class="toc-number">2.</span> <span class="toc-text">SLF4j 的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#如何使用"><span class="toc-number">2.1.</span> <span class="toc-text">如何使用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#遗留问题"><span class="toc-number">2.2.</span> <span class="toc-text">遗留问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SpringBoot-与日志的关系"><span class="toc-number">2.3.</span> <span class="toc-text">SpringBoot 与日志的关系</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#日志使用"><span class="toc-number">3.</span> <span class="toc-text">日志使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#切换日志框架"><span class="toc-number">4.</span> <span class="toc-text">切换日志框架</span></a></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-SpringBoot之日志" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      SpringBoot之日志
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/18e9d6ab/" class="article-date">
+	  <time datetime="2019-07-21T14:57:13.000Z" itemprop="datePublished">2019-07-21</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/springboot/">springboot</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/springboot/">springboot</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/18e9d6ab/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.3k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 5(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="日志框架"><a href="#日志框架" class="headerlink" title="日志框架"></a>日志框架</h2><p>日志门面：日志的一个抽象层</p>
+<p>市面上的日志框架：JUL、JCL、Jboss-logging、logback、log4j、log4j2、slf4j…<em>**</em></p>
+<table>
+<thead>
+<tr>
+<th>日志门面</th>
+<th>日志实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><del>JCL（久不更新）</del>、SLF4j、<del>jboss-logging（不适用于普通人群）</del></td>
+<td>Log4j、JUL（Java 自带）、log4j2（框架好但是有些尚未适配）、Logback（与Log4j是同一个作者）</td>
+</tr>
+</tbody>
+</table>
+<p>左边选一个门面（抽象层），右边选一个实现；</p>
+<p><strong>SpringBoot</strong> ：底层为 Spring框架默认选择 JCL、而 SpringBoot 选择 SLF4j、logback</p>
+<h2 id="SLF4j-的使用"><a href="#SLF4j-的使用" class="headerlink" title="SLF4j 的使用"></a>SLF4j 的使用</h2><h3 id="如何使用"><a href="#如何使用" class="headerlink" title="如何使用"></a>如何使用</h3><p>在开发时，不应直接调用日志的实现类，而是应该调用日志的抽象层的方法。</p>
+<p>导入 SLF4j 的 jar 和 logback 的 jar</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloWorld</span> </span>&#123;</span><br><span class="line">  <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Logger logger = LoggerFactory.getLogger(HelloWorld.class);</span><br><span class="line">    logger.info(<span class="string">"Hello World"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>图示：</p>
+<p><img src="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720143617.png" alt></p>
+<p>每一个日志的实现框架都有自己的配置文件，使用 SLF4j后，<strong>配置还是做成日志实现框架的自己的配置文件</strong>。</p>
+<h3 id="遗留问题"><a href="#遗留问题" class="headerlink" title="遗留问题"></a>遗留问题</h3><p>A（SLF4j + logback）：Spring 、Hibernate、MyBatis、….. A 系统的依赖使用了其他的日志框架</p>
+<p>统一日志记录，即使是别的框架也统一使用 SLF4j 输出</p>
+<p><img src="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720144123.png" alt></p>
+<p><strong>如何让系统中所有的日志都统一到slf4j：</strong></p>
+<ol>
+<li>将系统中其他日志框架先排除出去</li>
+<li>用中间包来替换原有的日志框架</li>
+<li>导入 slf4j 其他的实现</li>
+</ol>
+<h3 id="SpringBoot-与日志的关系"><a href="#SpringBoot-与日志的关系" class="headerlink" title="SpringBoot 与日志的关系"></a>SpringBoot 与日志的关系</h3><p>SpringBoot 使用日志功能</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-logging<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.6.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>底层依赖关系：</p>
+<p><img src="https://gitee.com/PhoenixBM/FigureBed/raw/picgo/img/20190720145802.png" alt></p>
+<p>总结：</p>
+<ol>
+<li>SpringBoot 底层也是使用 slf4j + logback 的方式进行日志记录的</li>
+<li>SpringBoot 把其他的日志都替换为了 slf4j</li>
+</ol>
+<p>Maven 排除 jar 包的方法：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>sample.ProjectB<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>Project-B<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">version</span>&gt;</span>1.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">scope</span>&gt;</span>compile<span class="tag">&lt;/<span class="name">scope</span>&gt;</span></span><br><span class="line">     <span class="tag">&lt;<span class="name">exclusions</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;<span class="name">exclusion</span>&gt;</span>  <span class="comment">&lt;!-- declare the exclusion here --&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>sample.ProjectC<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">         <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>Project-C<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">       <span class="tag">&lt;/<span class="name">exclusion</span>&gt;</span></span><br><span class="line">       <span class="comment">&lt;!-- ... --&gt;</span></span><br><span class="line">     <span class="tag">&lt;/<span class="name">exclusions</span>&gt;</span> </span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>也可以在 idea 的 maven 依赖树里面选中不需要的依赖，右键选择 删除</p>
+<h2 id="日志使用"><a href="#日志使用" class="headerlink" title="日志使用"></a>日志使用</h2><p><a href="https://segmentfault.com/a/1190000004693427" target="_blank" rel="noopener">LogBack入门实践</a></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 记录器</span></span><br><span class="line">   <span class="keyword">private</span> Logger logger = LoggerFactory.getLogger(getClass());</span><br><span class="line"></span><br><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">contextLoads</span><span class="params">()</span> </span>&#123;</span><br><span class="line">       <span class="comment">// 日志的级别，由低到高 -------------------</span></span><br><span class="line">       <span class="comment">// 可以调整输出的日志的级别；日志就只会在这个级别的以后的高级别生效</span></span><br><span class="line">       <span class="comment">// 跟踪轨迹</span></span><br><span class="line">       logger.trace(<span class="string">"这是 trace 日志..."</span>);</span><br><span class="line">       <span class="comment">// 调试信息</span></span><br><span class="line">       logger.debug(<span class="string">"这是 debug 日志..."</span>);</span><br><span class="line">       <span class="comment">// SpringBoot 默认只会输出 info 级别：root 级别</span></span><br><span class="line">       <span class="comment">// info</span></span><br><span class="line">       logger.info(<span class="string">"这是 info 日志..."</span>);</span><br><span class="line">       <span class="comment">// warning</span></span><br><span class="line">       logger.warn(<span class="string">"这是 warning 日志..."</span>);</span><br><span class="line">       <span class="comment">// error</span></span><br><span class="line">       logger.error(<span class="string">"这是 error 日志..."</span>);</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">logging.level.com.xuanc=trace</span><br><span class="line"># =========== logging.path 与 logging.file 冲突 ===========</span><br><span class="line"># 指定目录，创建路径的文件夹，日志输出文件名默认使用 spring.log</span><br><span class="line">logging.path=/tmp/spring/log</span><br><span class="line"># 如果不指定路径则在当前项目下生成日志，也可以指定路径</span><br><span class="line">#logging.file=springboot.log</span><br><span class="line"></span><br><span class="line"># 在控制台输出的日志的格式</span><br><span class="line">logging.pattern.console=%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %-5level %logger&#123;50&#125; - %msg%n</span><br><span class="line"># 指定文件中输出的日志的格式</span><br><span class="line">#logging.pattern.file=%d&#123;yyyy-MM-dd HH:mm:ss&#125; [%thread] %-5level %logger&#123;50&#125; - %msg%n</span><br></pre></td></tr></table></figure>
+<p>日志输出格式：</p>
+<ul>
+<li><code>%d</code> 表示时间日期</li>
+<li><code>%thread</code> 表示线程名</li>
+<li><code>%-5level</code>级别从左显示5个字符宽度</li>
+<li><code>%logger{50}</code> 表示 logger 名字最长为50个字符，否则按照据点分隔</li>
+<li><code>%msg</code> 日志消息</li>
+<li><code>%n</code> 换行符</li>
+</ul>
+<p>具体的可以在 SpringBoot 的 logging 下面的文件中查看：</p>
+<p><img src="../../../IdeaProjects/SpringBoot-ShangGuiG/images/1563610047818.png" alt="1563610047818"></p>
+<p>也可以<a href="https://qbgbook.gitbooks.io/spring-boot-reference-guide-zh/content/IV.%20Spring%20Boot%20features/26.5.%20Custom%20log%20configuration.html" target="_blank" rel="noopener">自定义日志配置</a>，在类路径下放上每个日志框架自己的配置文件后，SpringBoot 就不使用默认的配置了。</p>
+<p>以下文件会根据你选择的日志系统进行加载：</p>
+<table>
+<thead>
+<tr>
+<th>日志系统</th>
+<th style="text-align:center">定制配置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Logback</td>
+<td style="text-align:center"><code>logback-spring.xml</code>,<code>logback-spring.groovy</code>,<code>logback.xml</code>或<code>logback.groovy</code></td>
+</tr>
+<tr>
+<td>Log4j</td>
+<td style="text-align:center"><code>log4j.properties</code>或<code>log4j.xml</code></td>
+</tr>
+<tr>
+<td>Log4j2</td>
+<td style="text-align:center"><code>log4j2-spring.xml</code>或<code>log4j2.xml</code></td>
+</tr>
+<tr>
+<td>JDK (Java Util Logging)</td>
+<td style="text-align:center"><code>logging.properties</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>注</strong> 如果可能的话，建议你使用<code>-spring</code>变种形式定义日志配置（例如，使用<code>logback-spring.xml</code>（由 SpringBoot 完全控制）而不是<code>logback.xml</code>（日志框架会读取，跳过 SpringBoot））。如果你使用标准的配置路径，Spring可能不能够完全控制日志初始化。</p>
+<p>使用 <code>-spring</code> 还有一个优点：由 SpringBoot 来解析日志配置，可以使用 SpringBoot 的高级 <strong><em>Profile</em></strong> 功能。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">springProfile</span> <span class="attr">name</span>=<span class="string">"staging"</span>&gt;</span></span><br><span class="line">	<span class="comment">&lt;!-- 可以指定某段配置只在某个环境下生效 --&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">springProfile</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><code>&lt;springProfile&gt;</code>标签可用于根据激活的Spring profiles，选择性的包含或排除配置片段。Profile片段可以放在<code>&lt;configuration&gt;</code>元素内的任何地方，使用<code>name</code>属性定义哪些profile接受该配置，多个profiles以逗号分隔。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="tag">&lt;<span class="name">springProfile</span> <span class="attr">name</span>=<span class="string">"staging"</span>&gt;</span></span><br><span class="line">&gt;  <span class="comment">&lt;!-- configuration to be enabled when the "staging" profile is active --&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">springProfile</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">springProfile</span> <span class="attr">name</span>=<span class="string">"dev, staging"</span>&gt;</span></span><br><span class="line">&gt;  <span class="comment">&lt;!-- configuration to be enabled when the "dev" or "staging" profiles are active --&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">springProfile</span>&gt;</span></span><br><span class="line">&gt; </span><br><span class="line">&gt; <span class="tag">&lt;<span class="name">springProfile</span> <span class="attr">name</span>=<span class="string">"!production"</span>&gt;</span></span><br><span class="line">&gt;  <span class="comment">&lt;!-- configuration to be enabled when the "production" profile is not active --&gt;</span></span><br><span class="line">&gt; <span class="tag">&lt;/<span class="name">springProfile</span>&gt;</span></span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<h2 id="切换日志框架"><a href="#切换日志框架" class="headerlink" title="切换日志框架"></a>切换日志框架</h2><p>按照 SLF4j 的日志适配图，进行响应的转换。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://phoenixxc.github.io/posts/18e9d6ab/" title="SpringBoot之日志" target="_blank" rel="external">https://phoenixxc.github.io/posts/18e9d6ab/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+
+
+    </div>
+  </article>
+  
+    
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/d16715c9/" title="SpringBoot之Web开发"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/a29f8391/" title="SpringBoot之属性配置"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2019 PhoenixBM
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.js"></script>
+  <script>
+  //利用 FancyBox 实现点击图片放大
+  $(document).ready(function() {
+    $('article img').not('[hidden]').not('.panel-body img').each(function() {
+      var $image = $(this);
+      var imageCaption = $image.attr('alt');
+      var $imageWrapLink = $image.parent('a');
+      if ($imageWrapLink.length < 1) {
+        var src = this.getAttribute('src');
+        var idx = src.lastIndexOf('?');
+        if (idx != -1) {
+          src = src.substring(0, idx);
+        }
+        $imageWrapLink = $image.wrap('<a href="' + src + '"></a>').parent('a');
+      }
+      $imageWrapLink.attr('data-fancybox', 'images');
+      if (imageCaption) {
+        $imageWrapLink.attr('data-caption', imageCaption);
+      }
+    });
+    $().fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+    });
+  });
+  </script>
+
+
+
+    <script defer type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-133199137-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>

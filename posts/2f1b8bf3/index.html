@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="baidu-site-verification" content="pEnxIproHH">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="Cache-Control" content="no-transform">
+  <meta http-equiv="Cache-Control" content="no-siteapp">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no,email=no,adress=no">
+  <!-- Color theme for statusbar -->
+  <meta name="theme-color" content="#000000">
+  <!-- 强制页面在当前窗口以独立页面显示,防止别人在框架里调用页面 -->
+  <meta http-equiv="window-target" content="_top">
+  
+  
+  <title>Chapter7-使用JSTL | pxBlog</title>
+  <meta name="description" content="JSTL 简介JSTL 提供了与页面呈现相关的逻辑判断标签，也提供了对应 JSP 标注标签的扩展标签和更多的功能标签，可以分为五类：  核心标签库：提供条件判断、属性访问、URL 处理及错误处理等 I18N 兼容格式标签库：提供数字、日期等的格式化和区域、编码处理等功能 SQL 标签库 XML 标签库：提供 XML 解析、流程控制、转换等功能 函数标签库：提供常用字串处理的已定义 EL 标签库">
+<meta name="keywords" content="JSP&amp;Servlet学习笔记,Note">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Chapter7-使用JSTL">
+<meta property="og:url" content="https://phoenixxc.github.io/posts/2f1b8bf3/index.html">
+<meta property="og:site_name" content="pxBlog">
+<meta property="og:description" content="JSTL 简介JSTL 提供了与页面呈现相关的逻辑判断标签，也提供了对应 JSP 标注标签的扩展标签和更多的功能标签，可以分为五类：  核心标签库：提供条件判断、属性访问、URL 处理及错误处理等 I18N 兼容格式标签库：提供数字、日期等的格式化和区域、编码处理等功能 SQL 标签库 XML 标签库：提供 XML 解析、流程控制、转换等功能 函数标签库：提供常用字串处理的已定义 EL 标签库">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-17T08:17:06.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Chapter7-使用JSTL">
+<meta name="twitter:description" content="JSTL 简介JSTL 提供了与页面呈现相关的逻辑判断标签，也提供了对应 JSP 标注标签的扩展标签和更多的功能标签，可以分为五类：  核心标签库：提供条件判断、属性访问、URL 处理及错误处理等 I18N 兼容格式标签库：提供数字、日期等的格式化和区域、编码处理等功能 SQL 标签库 XML 标签库：提供 XML 解析、流程控制、转换等功能 函数标签库：提供常用字串处理的已定义 EL 标签库">
+  <!-- Canonical links -->
+  <link rel="canonical" href="https://phoenixxc.github.io/posts/2f1b8bf3/index.html">
+  
+    <link rel="alternate" href="/atom.xml" title="pxBlog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png" type="image/x-icon">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  
+  
+  
+    <link href="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.css" rel="stylesheet">
+  
+  
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.css">
+  
+  <!--  -->
+
+  <script>
+    (function(){
+        var bp = document.createElement('script');
+        var curProtocol = window.location.protocol.split(':')[0];
+        if (curProtocol === 'https'){
+       bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+      }
+      else{
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+      }
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(bp, s);
+    })();
+    </script>
+        
+</head>
+
+
+<body class="main-center theme-black" itemscope itemtype="http://schema.org/WebPage">
+  <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+  <div class="slimContent">
+    <div class="navbar-header">
+      
+      
+      <div class="profile-block text-center">
+        <a id="avatar" href="https://github.com/PhoenixXC" target="_blank">
+          <img class="img-circle img-rotate" src="/images/avatar.jpg" width="200" height="200">
+        </a>
+        <h2 id="name" class="hidden-xs hidden-sm">PhoenixXC</h2>
+        <h3 id="title" class="hidden-xs hidden-sm hidden-md"></h3>
+        <small id="location" class="text-muted hidden-xs hidden-sm"><i class="icon icon-map-marker"></i> Xi&#39;an, China</small>
+      </div>
+      
+      <div class="search" id="search-form-wrap">
+
+    <form class="search-form sidebar-form">
+        <div class="input-group">
+            <input type="text" class="search-form-input form-control" placeholder="搜索" />
+            <span class="input-group-btn">
+                <button type="submit" class="search-form-submit btn btn-flat" onclick="return false;"><i class="icon icon-search"></i></button>
+            </span>
+        </div>
+    </form>
+    <div class="ins-search">
+  <div class="ins-search-mask"></div>
+  <div class="ins-search-container">
+    <div class="ins-input-wrapper">
+      <input type="text" class="ins-search-input" placeholder="想要查找什么..." x-webkit-speech />
+      <button type="button" class="close ins-close ins-selectable" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+    </div>
+    <div class="ins-section-wrapper">
+      <div class="ins-section-container"></div>
+    </div>
+  </div>
+</div>
+
+
+</div>
+
+      <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#main-navbar" aria-controls="main-navbar" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+    </div>
+    <nav id="main-navbar" class="collapse navbar-collapse" itemscope itemtype="http://schema.org/SiteNavigationElement" role="navigation">
+      <ul class="nav navbar-nav main-nav menu-highlight">
+        
+        
+        <li class="menu-item menu-item-home">
+          <a href="/.">
+            
+            <i class="icon icon-home-fill"></i>
+            
+            <span class="menu-title">首页</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives">
+            
+            <i class="icon icon-archives-fill"></i>
+            
+            <span class="menu-title">归档</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories">
+            
+            <i class="icon icon-folder"></i>
+            
+            <span class="menu-title">分类</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags">
+            
+            <i class="icon icon-tags"></i>
+            
+            <span class="menu-title">标签</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-repository">
+          <a href="/repository">
+            
+            <i class="icon icon-project"></i>
+            
+            <span class="menu-title">项目</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-links">
+          <a href="/links">
+            
+            <i class="icon icon-friendship"></i>
+            
+            <span class="menu-title">友链</span>
+          </a>
+        </li>
+        
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about">
+            
+            <i class="icon icon-cup-fill"></i>
+            
+            <span class="menu-title">关于</span>
+          </a>
+        </li>
+        
+      </ul>
+      
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    </nav>
+  </div>
+</header>
+
+  
+    <aside class="sidebar" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    
+      <div class="widget">
+    <h3 class="widget-title">一言</h3>
+    <div class="widget-body">
+        <div id="board">
+            <div class="content">
+                <p>虽千万人，吾往矣<hr>曾有蝼蚁想穿越汪洋<br>穿越整个天地<br>看看最远的地方<hr></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget-body">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Linux-C/">Linux C</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Servlet/">Servlet</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/SpringBoot/">SpringBoot</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/springboot/">springboot</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget-body">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/JSP-Servlet学习笔记/">JSP&Servlet学习笔记</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Note/">Note</a><span class="tag-list-count">8</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SpringBoot/">SpringBoot</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/readline/">readline</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/springboot/">springboot</a><span class="tag-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget-body tagcloud">
+      <a href="/tags/JSP-Servlet学习笔记/" style="font-size: 13.67px;">JSP&Servlet学习笔记</a> <a href="/tags/Java/" style="font-size: 13px;">Java</a> <a href="/tags/Note/" style="font-size: 14px;">Note</a> <a href="/tags/SpringBoot/" style="font-size: 13px;">SpringBoot</a> <a href="/tags/readline/" style="font-size: 13px;">readline</a> <a href="/tags/springboot/" style="font-size: 13.33px;">springboot</a>
+    </div>
+  </div>
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget-body">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/07/">七月 2019</a><span class="archive-list-count">12</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">一月 2019</a><span class="archive-list-count">2</span></li></ul>
+    </div>
+  </div>
+
+
+    
+      
+  <div class="widget">
+    <h3 class="widget-title">最新文章</h3>
+    <div class="widget-body">
+      <ul class="recent-post-list list-unstyled no-thumbnail">
+        
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/学习笔记-疯狂Java讲义/">学习笔记 - 疯狂Java讲义</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/603dd0d7/" class="title">学习笔记－疯狂Java讲义[4]</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.774Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2f1b8bf3/" class="title">Chapter7-使用JSTL</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/2bd95d05/" class="title">Chapter6-使用jsp</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/92aa08ef/" class="title">Chapter2 编写与设置Servlet</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+          <li>
+            
+            <div class="item-inner">
+              <p class="item-category">
+                <a class="category-link" href="/categories/Servlet/">Servlet</a>
+              </p>
+              <p class="item-title">
+                <a href="/posts/b2e1ccaf/" class="title">Chapter4 会话管理基本原理</a>
+              </p>
+              <p class="item-date">
+                <time datetime="2019-07-21T15:32:17.768Z" itemprop="datePublished">2019-07-21</time>
+              </p>
+            </div>
+          </li>
+          
+      </ul>
+    </div>
+  </div>
+  
+
+    
+  </div>
+</aside>
+
+  
+  
+<aside class="sidebar sidebar-toc collapse" id="collapseToc" itemscope itemtype="http://schema.org/WPSideBar">
+  <div class="slimContent">
+    <nav id="toc" class="article-toc">
+      <h3 class="toc-title">文章目录</h3>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#JSTL-简介"><span class="toc-number">1.</span> <span class="toc-text">JSTL 简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#核心标签库"><span class="toc-number">2.</span> <span class="toc-text">核心标签库</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#流程处理标签"><span class="toc-number">2.1.</span> <span class="toc-text">流程处理标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#错误处理标签"><span class="toc-number">2.2.</span> <span class="toc-text">错误处理标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#网页导入、重定向、URL处理标签"><span class="toc-number">2.3.</span> <span class="toc-text">网页导入、重定向、URL处理标签</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#属性处理与输出标签"><span class="toc-number">2.4.</span> <span class="toc-text">属性处理与输出标签</span></a></li></ol></li></ol>
+    </nav>
+  </div>
+</aside>
+
+<main class="main" role="main">
+  <div class="content">
+  <article id="post-Chapter7-使用JSTL" class="article article-type-post" itemscope itemtype="http://schema.org/BlogPosting">
+    
+    <div class="article-header">
+      
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Chapter7-使用JSTL
+    </h1>
+  
+
+      
+      <div class="article-meta">
+        <span class="article-date">
+    <i class="icon icon-calendar-check"></i>
+	<a href="/posts/2f1b8bf3/" class="article-date">
+	  <time datetime="2019-07-21T15:32:17.771Z" itemprop="datePublished">2019-07-21</time>
+	</a>
+</span>
+        
+  <span class="article-category">
+    <i class="icon icon-folder"></i>
+    <a class="article-category-link" href="/categories/Servlet/">Servlet</a>
+  </span>
+
+        
+  <span class="article-tag">
+    <i class="icon icon-tags"></i>
+	<a class="article-tag-link" href="/tags/JSP-Servlet学习笔记/">JSP&Servlet学习笔记</a>, <a class="article-tag-link" href="/tags/Note/">Note</a>
+  </span>
+
+
+        
+	<span class="article-read hidden-xs">
+	    <i class="icon icon-eye-fill" aria-hidden="true"></i>
+	    <span id="busuanzi_container_page_pv">
+			<span id="busuanzi_value_page_pv">0</span>
+		</span>
+	</span>
+
+
+        <span class="post-comment"><i class="icon icon-comment"></i> <a href="/posts/2f1b8bf3/#comments" class="article-comment-link">评论</a></span>
+        
+	
+		<span class="post-wordcount hidden-xs" itemprop="wordCount">字数统计: 1.4k(字)</span>
+	
+	
+		<span class="post-readcount hidden-xs" itemprop="timeRequired">阅读时长: 5(分)</span>
+	
+
+      </div>
+    </div>
+    <div class="article-entry marked-body" itemprop="articleBody">
+      
+        <h2 id="JSTL-简介"><a href="#JSTL-简介" class="headerlink" title="JSTL 简介"></a>JSTL 简介</h2><p>JSTL 提供了与页面呈现相关的逻辑判断标签，也提供了对应 JSP 标注标签的扩展标签和更多的功能标签，可以分为五类：</p>
+<ul>
+<li>核心标签库：提供条件判断、属性访问、URL 处理及错误处理等</li>
+<li>I18N 兼容格式标签库：提供数字、日期等的格式化和区域、编码处理等功能</li>
+<li>SQL 标签库</li>
+<li>XML 标签库：提供 XML 解析、流程控制、转换等功能</li>
+<li>函数标签库：提供常用字串处理的已定义 EL 标签库</li>
+</ul>
+<p>idea 使用 JSTL 标签库：</p>
+<ol>
+<li>在 <a href="http://archive.apache.org/dist/jakarta/taglibs/standard/binaries/" target="_blank" rel="noopener">JSTL</a> 中下载最新的 zip 文件，解压。</li>
+<li>idea 中打开设置，搜索 Schemas and DTDs，点右边的 +，URL中输入 <a href="http://java.sun.com/jsp/jstl/core，浏览文件选择刚才解压后文件夹中的" target="_blank" rel="noopener">http://java.sun.com/jsp/jstl/core，浏览文件选择刚才解压后文件夹中的</a> tld 目录下的 c.tld 文件。</li>
+<li>将 zip 文件夹中的 lib 里的文件复制到项目中的 WEB-INF 的 lib 目录下，或者在 Project Setting -&gt; Libraries  中点＋，选择 lib 文件夹里面的文件。</li>
+</ol>
+<h2 id="核心标签库"><a href="#核心标签库" class="headerlink" title="核心标签库"></a>核心标签库</h2><h3 id="流程处理标签"><a href="#流程处理标签" class="headerlink" title="流程处理标签"></a>流程处理标签</h3><figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;param.name == 'momor'&amp;&amp; param.password == '1234'&#125;"</span>&gt;</span><br><span class="line">    &lt;h1&gt;$&#123;param.name&#125; 登录成功 &lt;/h1&gt;</span><br><span class="line">&lt;/c:if&gt;</span><br><span class="line">&lt;%-- JSTL中可以使用EL表达式--%&gt;</span><br></pre></td></tr></table></figure>
+<p>如果 <code>test</code> 属性为 true，才会输出 <code>&lt;c:if&gt;</code> 标签中的语句。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:choose&gt;</span><br><span class="line">    &lt;c:when test=<span class="string">"$&#123;user.valid&#125;"</span>&gt;</span><br><span class="line">        &lt;jsp:getProperty name=<span class="string">"user"</span> property=<span class="string">"name"</span>/&gt; 登录成功</span><br><span class="line">        &lt;%--</span><br><span class="line">    	* 属性的名称就是get/set方法去除get/set后 ,再把首字母小写</span><br><span class="line">		* <span class="keyword">boolean</span>的方法可以是is开头</span><br><span class="line">		--%&gt;</span><br><span class="line">    &lt;/c:when&gt;</span><br><span class="line">    &lt;c:otherwise&gt;</span><br><span class="line">        &lt;h1&gt; 登录失败 &lt;/h1&gt;</span><br><span class="line">    &lt;/c:otherwise&gt;</span><br><span class="line">&lt;/c:choose&gt;</span><br></pre></td></tr></table></figure>
+<p>当 <code>&lt;c:when&gt;</code> test 为 true 时，只会输出这个标签中的 Body 内容。否则继续判断下一个 <code>&lt;c:when&gt;</code>  标签中的 test，如果所有的 <code>&lt;c:when&gt;</code> 都不满足，就输出 <code>&lt;c:otherwise&gt;</code> 的内容（如果有这个标签）。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:forEach <span class="keyword">var</span>=<span class="string">"message"</span> items=<span class="string">"$&#123;messageService.messages&#125;"</span>&gt;</span><br><span class="line">    &lt;tr&gt;</span><br><span class="line">        &lt;td&gt;$&#123;message.name&#125;&lt;/td&gt;</span><br><span class="line">        &lt;td&gt;$&#123;message.text&#125;&lt;/td&gt;</span><br><span class="line">    &lt;/tr&gt;</span><br><span class="line">&lt;/c:forEach&gt;</span><br></pre></td></tr></table></figure>
+<p>类似 Java 中的 forEach 循环，<code>items</code> 属性可以是数组、<code>Collection</code>、<code>Iterator</code>、<code>Enumeration</code>、<code>Map</code> 与字符串。每次会从 <code>items</code> 中取出元素，指定给 <code>var</code> 属性设置的变量。</p>
+<p><code>items</code> 属性是 <code>Map</code> :</p>
+<p>&emsp;&emsp;设置给 <code>var</code> 的对象是 <code>Map.Entry</code> ，有 <code>getKey()</code> <code>getValue()</code> 方法取得键与值。</p>
+<p><code>items</code> 属性是字符串：</p>
+<p>&emsp;&emsp;以逗号来切割字符串，如果要自定义切割依据可以使用<code>&lt;c:forTokens&gt;</code></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:forTokens <span class="keyword">var</span>=<span class="string">"token"</span> delims=<span class="string">";"</span> items=<span class="string">"a;b;c;d;e"</span>&gt;</span><br><span class="line">	&lt;%-- ... --%&gt;</span><br><span class="line">&lt;/c:forTokens&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="错误处理标签"><a href="#错误处理标签" class="headerlink" title="错误处理标签"></a>错误处理标签</h3><p>错误发生时，在当前网页捕捉异常并显示相关信息。使用 <code>&lt;c:catch&gt;</code> 标签。</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:<span class="keyword">catch</span> <span class="keyword">var</span>=<span class="string">"error"</span>&gt;</span><br><span class="line">    $&#123;param.a&#125; + $&#123;param.b&#125; = $&#123;param.a + param.b&#125;</span><br><span class="line">&lt;/c:catch&gt;</span><br><span class="line">&lt;c:<span class="keyword">if</span> test=<span class="string">"$&#123;error != null&#125;"</span>&gt;</span><br><span class="line">    &lt;br&gt;&lt;span style="color: red;"&gt;$&#123;error.message&#125;&lt;/span&gt;</span><br><span class="line">    &lt;br&gt;$&#123;error&#125;</span><br><span class="line">&lt;/c:if&gt;</span><br></pre></td></tr></table></figure>
+<p>用 <code>&lt;c:catch&gt;</code> 标签将可能产生异常的部分包起来，如果有异常会给 <code>var</code> 设值。所有的异常都是 <code>Throwable</code> 的子类，都有 <code>getMessage()</code> 方法。</p>
+<h3 id="网页导入、重定向、URL处理标签"><a href="#网页导入、重定向、URL处理标签" class="headerlink" title="网页导入、重定向、URL处理标签"></a>网页导入、重定向、URL处理标签</h3><p>包含其他 JSP 网页到当前网页的几种方式：</p>
+<ul>
+<li><code>&lt;%@include file=&quot;/....&quot; %&gt;</code></li>
+<li>使用 <code>&lt;jsp:include&gt;</code> 标签，动态包含，还可传递参数</li>
+</ul>
+<p>JSTL 中有一个 <code>&lt;c:import&gt;</code> 标签，也可以在运行时动态导入到另一个网页。</p>
+<figure class="highlight jsp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:<span class="keyword">import</span> url=<span class="string">"add.jsp"</span>&gt;</span><br><span class="line">	&lt;c:param name=<span class="string">"a"</span> value=<span class="string">"1"</span> /&gt;</span><br><span class="line">    &lt;%-- 用 &lt;c:param&gt; 标签传递参数--%&gt;</span><br><span class="line">&lt;/c:import&gt;</span><br><span class="line">&lt;c:<span class="keyword">import</span> url=<span class="string">"https://...."</span> charEncoding=<span class="string">"BIG5"</span> /&gt;</span><br><span class="line">&lt;%--导入外部网页，如果编码不同需指定具体编码--%&gt;</span><br><span class="line">&lt;%--没有使用参数--%&gt;</span><br></pre></td></tr></table></figure>
+<p><code>&lt;c:redirect&gt;</code> 标签，可以重定向网页，类似 Servlet 中的 <code>HttpServletResponse.sendRedirect()</code> 方法，可以使用 <code>&lt;c:param&gt;</code> 标签在重定向时指定参数。</p>
+<p>之前利用 <code>response.encodeURL()</code> 方法来作 URL 重写，以在关闭 Cookie 后正常维持 Session 进行会话管理，现在可以用 <code>&lt;c:url&gt;</code> 标签达到同样的目的。</p>
+<h3 id="属性处理与输出标签"><a href="#属性处理与输出标签" class="headerlink" title="属性处理与输出标签"></a>属性处理与输出标签</h3><p>可以用 JSTL 设置属性：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;c:set <span class="keyword">var</span>=<span class="string">"p1q1"</span> value=<span class="string">"$&#123;param.p1q1&#125;"</span> scope=<span class="string">"session"</span> /&gt;</span><br><span class="line">&lt;%--属性值太长可以用 Body 形式--%&gt;</span><br><span class="line">&lt;c:set <span class="keyword">var</span>=<span class="string">"p1q2"</span> scope=<span class="string">"session"</span>&gt;</span><br><span class="line">    some....</span><br><span class="line">&lt;/c:set&gt;</span><br></pre></td></tr></table></figure>
+<p><code>var</code> 用来设置属性名，<code>value</code> 设置属性值（可以用 EL 表达式），如果不设置 <code>scope</code> ，会从 <code>page</code> 、<code>request</code> 、<code>session</code>、<code>application</code> 的范围中查找属性名称，如果找到就在该范围设置，找不到就在<code>page</code> 范围新建。</p>
+<p>移除属性：<code>&lt;c:remove var=&quot;login&quot; scope=&quot;session&quot;/&gt;</code></p>
+<p><code>&lt;c:set&gt;</code> 可以设置 JavaBean 的属性或 <code>Map</code> 对象的键/值，需要使用 <code>target</code> 属性进行设置。</p>
+<p><code>&lt;c:set target=&quot;${pageContext.request}&quot; property=&quot;characterEncoding&quot; value=&quot;UTF-8&quot; /&gt;</code></p>
+<p>如果 <code>target</code> 属性是 JavaBean，就用 JavaBean 的 <code>setXXX</code> 方法为 <code>property</code> 设值。</p>
+<p>如果是 <code>Map</code> 对象，则会以 <code>property</code> 为键，以 <code>value</code> 为值。</p>
+<hr>
+<p><code>&lt;c：out&gt;</code> 标签可以输出内容，并用合适的字符替换 &lt;、&gt;、”等字符。eg.<code>&lt;c:out value=&quot;some&quot;&gt;</code></p>
+<p>如果不想取代字符，可以设置属性 <code>escapeXml</code> 为 <code>false</code> （默认为 true），如果输出内容的 EL 表达式结果为 null 时，不会显示任何内容，也可以加上 <code>default</code> 属性设置为null时的默认值。</p>
+
+      
+    </div>
+    <div class="article-footer">
+      <blockquote class="mt-2x">
+  <ul class="post-copyright list-unstyled">
+    
+    <li class="post-copyright-link hidden-xs">
+      <strong>本文链接：</strong>
+      <a href="https://phoenixxc.github.io/posts/2f1b8bf3/" title="Chapter7-使用JSTL" target="_blank" rel="external">https://phoenixxc.github.io/posts/2f1b8bf3/</a>
+    </li>
+    
+    <li class="post-copyright-license">
+      <strong>版权声明： </strong> 本博客所有文章除特别声明外，均采用 <a href="http://creativecommons.org/licenses/by/4.0/deed.zh" target="_blank" rel="external">CC BY 4.0 CN协议</a> 许可协议。转载请注明出处！
+    </li>
+  </ul>
+</blockquote>
+
+
+
+
+    </div>
+  </article>
+  
+    
+  <section id="comments">
+  	
+           
+    
+  </section>
+
+
+  
+</div>
+
+  <nav class="bar bar-footer clearfix" data-stick-bottom>
+  <div class="bar-inner">
+  
+  <ul class="pager pull-left">
+    
+    <li class="prev">
+      <a href="/posts/603dd0d7/" title="学习笔记－疯狂Java讲义[4]"><i class="icon icon-angle-left" aria-hidden="true"></i><span>&nbsp;&nbsp;上一篇</span></a>
+    </li>
+    
+    
+    <li class="next">
+      <a href="/posts/2bd95d05/" title="Chapter6-使用jsp"><span>下一篇&nbsp;&nbsp;</span><i class="icon icon-angle-right" aria-hidden="true"></i></a>
+    </li>
+    
+    
+    <li class="toggle-toc">
+      <a class="toggle-btn collapsed" data-toggle="collapse" href="#collapseToc" aria-expanded="false" title="文章目录" role="button">
+        <span>[&nbsp;</span><span>文章目录</span>
+        <i class="text-collapsed icon icon-anchor"></i>
+        <i class="text-in icon icon-close"></i>
+        <span>]</span>
+      </a>
+    </li>
+    
+  </ul>
+  
+  
+  
+  <div class="bar-right">
+    
+    <div class="share-component" data-sites="weibo,qq,wechat,facebook,twitter" data-mobile-sites="weibo,qq,qzone"></div>
+    
+  </div>
+  </div>
+</nav>
+  
+
+
+</main>
+
+  <footer class="footer" itemscope itemtype="http://schema.org/WPFooter">
+	
+	
+    <ul class="social-links">
+    	
+        <li><a href="https://github.com/PhoenixXC" target="_blank" title="Github" data-toggle=tooltip data-placement=top><i class="icon icon-github"></i></a></li>
+        
+        <li><a href="/atom.xml" target="_blank" title="Rss" data-toggle=tooltip data-placement=top><i class="icon icon-rss"></i></a></li>
+        
+    </ul>
+
+    <div class="copyright">
+    	
+        &copy; 2019 PhoenixBM
+        
+        <div class="publishby">
+        	Theme by <a href="https://github.com/cofess" target="_blank"> cofess </a>base on <a href="https://github.com/cofess/hexo-theme-pure" target="_blank">pure</a>.
+        </div>
+    </div>
+</footer>
+  <script src="//cdn.jsdelivr.net/npm/jquery@1.12.4/dist/jquery.min.js"></script>
+<script>
+window.jQuery || document.write('<script src="js/jquery.min.js"><\/script>')
+</script>
+<script src="/js/plugin.min.js"></script>
+<script src="/js/application.js"></script>
+
+    <script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+
+
+
+
+   
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+
+   
+    
+  <!-- <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css"> -->
+  <script src="//cdn.jsdelivr.net/npm/gitalk@1.4.0/dist/gitalk.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/blueimp-md5@2.10.0/js/md5.min.js"></script>
+  <script type="text/javascript">
+  var gitalk = new Gitalk({
+    clientID: '7dd5f62e69a350081d67',
+    clientSecret: '21de774924dfc29594c7e6b1edb66ec1d47de4a6',
+    repo: 'PhoenixXC.github.io',
+    owner: 'PhoenixXC',
+    admin: ['PhoenixXC'],
+    id: md5(location.pathname),
+    distractionFreeMode: true
+  })
+  gitalk.render('comments')
+  </script>
+
+      
+
+
+
+  <script src="//cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.3.5/dist/jquery.fancybox.min.js"></script>
+  <script>
+  //利用 FancyBox 实现点击图片放大
+  $(document).ready(function() {
+    $('article img').not('[hidden]').not('.panel-body img').each(function() {
+      var $image = $(this);
+      var imageCaption = $image.attr('alt');
+      var $imageWrapLink = $image.parent('a');
+      if ($imageWrapLink.length < 1) {
+        var src = this.getAttribute('src');
+        var idx = src.lastIndexOf('?');
+        if (idx != -1) {
+          src = src.substring(0, idx);
+        }
+        $imageWrapLink = $image.wrap('<a href="' + src + '"></a>').parent('a');
+      }
+      $imageWrapLink.attr('data-fancybox', 'images');
+      if (imageCaption) {
+        $imageWrapLink.attr('data-caption', imageCaption);
+      }
+    });
+    $().fancybox({
+      selector: '[data-fancybox="images"]',
+      hash: false,
+      loop: false,
+    });
+  });
+  </script>
+
+
+
+    <script defer type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-133199137-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+
+
+
+</body>
+</html>
